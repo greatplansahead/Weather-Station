@@ -6,7 +6,6 @@
 
 import RPi.GPIO as GPIO
 import Adafruit_DHT
-import Adafruit_MCP3008
 import psutil
 import socket
 from math import pow
