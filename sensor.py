@@ -1,11 +1,5 @@
-# Module with all the functions to measure the data from the DHT11 sensors
-# and from the Raspberry Pi operating system.
-# It requires  Adafruit_DHT library to be installed prior to using this module.
-# Adafruit_DHT web link: https://github.com/adafruit/Adafruit_Python_DHT
-
-
 import RPi.GPIO as GPIO
-import Adafruit_DHT
+import dht11
 import psutil
 import socket
 from math import pow
@@ -16,10 +10,12 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)  # Broadcom pin-numbering scheme
 sensor_pin = 14
 
+#initialize DHT sensor
+sensor = dht11.DHT11(pin=sensor_pin)
 
 def get_pi_data():
     # Calculate CPU temperature of Raspberry Pi in Degrees C
-    pi_temp = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1e3  # Get Raspberry Pi CPU Temperature
+    pi_temp = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1e3  # Get Raspber>
     # CPU system load in %
     cpu_usage = psutil.getloadavg()[0]
     # RAM usage
@@ -33,14 +29,21 @@ def get_pi_data():
     # Hostname & IP address
     HOSTNAME = socket.gethostname()
     # IP = socket.gethostbyname(HOSTNAME)
-    return pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTNAME
+    return pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used>
 
 def get_dht11_data():
     measure = True
     while measure:
-        humid, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, sensor_pin)    # If different sensor, change the type
-        sleep(3)
-        if humid is not None:       # Check if measure successful or not
-            if humid < 100:         # Basic data check: if humidity level is above 100%, then remeasure
-                measure = False
+       try:
+           sensor.measure()
+           humid = sensor.humidity
+           temp = sensor.temperature
+           sleep(3)
+           if humid is not None and humid < 100:
+               measure = False
+       except RuntimeError as e:
+           print(f"Error reading DHT11: {e}")
+           sleep(2)
     return humid, temp
+
+
