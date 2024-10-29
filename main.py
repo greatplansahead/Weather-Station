@@ -1,7 +1,8 @@
 # This code will run a weather station that sends the data to ThingSpeak
 
 # External module imports
-import RPi.GPIO as GPIO
+import digitalio
+import board
 from time import sleep
 import logging
 import signal
@@ -16,21 +17,38 @@ import thingspeak
 # ----------------------------------
 
 # Raspberry Pi pin definitons
-greenLED_pin = 20               # Green LED: ON when script is running
-blueLED_pin = 8                 # Blue LED: ON when weather conditions measured and sent to Thing Speak
-button_scriptOFF_pin = 21       # Push button to stop the script manually
-button_LCD = 27                 # Push button to write data on LCD screen
-button_poweroff = 1             # Push button to turn off Raspberry Pi
+greenLED_pin = board.D20               # Green LED: ON when script is running
+blueLED_pin = board.D8                 # Blue LED: ON when weather conditions measured and sent to Thing Speak
+button_scriptOFF_pin = board.D21       # Push button to stop the script manually
+button_LCD = board.D27                 # Push button to write data on oled screen
+button_poweroff = board.D1             # Push button to turn off Raspberry Pi
 button_scriptOFF_pressed = False
 
 # Raspberry Pi pin Setup:
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)  # Broadcom pin-numbering scheme
-GPIO.setup(greenLED_pin, GPIO.OUT, initial=1)
-GPIO.setup(blueLED_pin, GPIO.OUT, initial=0)
-GPIO.setup(button_scriptOFF_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  # Button set as input
-GPIO.setup(button_LCD, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  # Button set as input
-GPIO.setup(button_poweroff, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  # Button set as input
+#greenled
+greenLED = digitalio.DigitalInOut(greenLED_pin)
+greenLED.direction = digitalio.Direction.OUTPUT
+greenLED.value = True
+
+#blueLED
+blueLED = digitalio.DigitalInOut(blueLED_pin)
+blueLED.direction = digitalio.Direction.OUTPUT
+blueLED.value = False
+
+#scriptbutton
+button_scriptOFF = digital.DigitalInOut(button_scriptOFF_pin)
+button_scriptOFF.direction = digital.Direction.INPUT
+button_scriptOFF.pull = digitalio.Pull.DOWN
+
+#oledbutton
+button_LCD = digitalio.DigitalInOut(button_LCD)
+button_LCD.directectio = digital.Direction.INPUT
+button_LCD.pull = digitalio.Pull.DOWN
+
+#poweroffbutton
+button_poweroff = digitalio.DigitalInOut(button_LCD)
+button_poweroff.directectio = digital.Direction.INPUT
+button_poweroff.pull = digitalio.Pull.DOWN
 
 # ThingSpeak API
 API = True                      # Enable / disable API connection with ThingSpeak
@@ -88,29 +106,29 @@ signal.signal(signal.SIGTERM, handler_term_signal)
 while run and button_scriptOFF_pressed is False:
     logging.info('Script Started')
     try:
-        while 1:
-            if GPIO.input(button_scriptOFF_pin) == 0:
+        while True:
+            if not button_scriptOFF.value:
                 date_now = datetime.now()
                 time_delta = date_now - last_api_update
 
                 # Updating the API only if enabled AND for the laps specified
                 if API is True and (time_delta.seconds > api_update_time_laps*60 or first_update):
-                    GPIO.output(blueLED_pin, GPIO.HIGH)
+                    blueLED.value = True
                     display.display_message('Updating ThingSpeak...', False)
                     get_data()
                     first_update, last_api_update = \
                         thingspeak.update_thingspeak(first_update, pi_temp, room_temp, room_humidity,
                                                           cpu_usage, ram_usage, disk_usage)
                     display.display_clear()
-                    GPIO.output(blueLED_pin, GPIO.LOW)
+                    blueLED.value = False
 
-                if GPIO.input(button_LCD) == 1:
-                    GPIO.output(blueLED_pin, GPIO.HIGH)
+                if blutton_LCD.value:
+                    blueLED.value = True
                     display.display_message('Measuring...', False)
                     get_data()
                     display.display_weather(room_temp, room_humidity)
                     display.display_config(pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used)
-                    GPIO.output(blueLED_pin, GPIO.LOW)
+                    blueLED.value = False
 
             else:
                 display.display_message('Script stopped', True, 3)
