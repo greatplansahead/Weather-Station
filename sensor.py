@@ -1,14 +1,13 @@
-import RPi.GPIO as GPIO
+import digitalio
+import board
 import dht11
 import psutil
 import socket
 from math import pow
 from time import sleep
 
-# Pin definition
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)  # Broadcom pin-numbering scheme
-sensor_pin = 14
+#pin definition
+sensor_pin = board.D14
 
 #initialize DHT sensor
 sensor = dht11.DHT11(pin=sensor_pin)
