@@ -1,23 +1,24 @@
-# Module with all the functions to display on the LCD screen
-# It requires both Adafruit_SSD1306 library to be installed prior to using this module.
-# Adafruit_SSD1306 web link: https://github.com/adafruit/Adafruit_Python_SSD1306
+#with the ssd1306 library from circuit python
 
-import Adafruit_SSD1306
+import adafruit_ssd1306
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from time import sleep
 
+WIDTH = 128
+HEIGHT = 64
 # 128x32 display with hardware I2C:
-disp = Adafruit_SSD1306.SSD1306_128_32(rst=None, i2c_address=0x3C)
-
+i2c = board.I2C()
+disp = adafruit_ssd1306.SSD1306_128_32(WIDTH, HEIGHT, i2c, addr=0x3C)
+                                       
 def display_clear():
     # Initialize library.
     disp.begin()
 
     # Clear display.
-    disp.clear()
-    disp.display()
+    disp.fill(0)
+    disp.show()
 
 def display_message(msg, clear_screen, display_time=10):
     display_clear()
@@ -45,12 +46,12 @@ def display_message(msg, clear_screen, display_time=10):
 
     draw.text((x, top), str(msg), font=font, fill=255)
     disp.image(image)
-    disp.display()
+    disp.show()
 
     if clear_screen is True:
         sleep(display_time)
 
-        disp.clear()
+        disp.fill(0)
         disp.display()
 
 def display_weather(room_temp, room_humidity):
@@ -87,12 +88,12 @@ def display_weather(room_temp, room_humidity):
 
     # Display image.
     disp.image(image)
-    disp.display()
+    disp.show()
 
     sleep(10)
 
-    disp.clear()
-    disp.display()
+    disp.fill(0)
+    disp.show()
 
 def display_config(pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used):
     display_clear()
@@ -129,9 +130,9 @@ def display_config(pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used):
 
     # Display image.
     disp.image(image)
-    disp.display()
+    disp.show()
 
     sleep(10)
 
-    disp.clear()
-    disp.display()
+    disp.fill(0)
+    disp.show()
