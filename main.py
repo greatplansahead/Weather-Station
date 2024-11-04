@@ -18,10 +18,10 @@ import thingspeak
 
 # Raspberry Pi pin definitons
 greenLED_pin = board.D20               # Green LED: ON when script is running
-blueLED_pin = board.D8                 # Blue LED: ON when weather conditions measured and sent to Thing Speak
+blueLED_pin = board.D8                 # Blue LED: ON when weather conditions measured and s>
 button_scriptOFF_pin = board.D21       # Push button to stop the script manually
 button_LCD = board.D27                 # Push button to write data on oled screen
-button_poweroff = board.D1             # Push button to turn off Raspberry Pi
+button_poweroff_pin = board.D16             # Push button to turn off Raspberry Pi
 button_scriptOFF_pressed = False
 
 # Raspberry Pi pin Setup:
@@ -36,18 +36,18 @@ blueLED.direction = digitalio.Direction.OUTPUT
 blueLED.value = False
 
 #scriptbutton
-button_scriptOFF = digital.DigitalInOut(button_scriptOFF_pin)
-button_scriptOFF.direction = digital.Direction.INPUT
+button_scriptOFF = digitalio.DigitalInOut(button_scriptOFF_pin)
+button_scriptOFF.direction = digitalio.Direction.INPUT
 button_scriptOFF.pull = digitalio.Pull.DOWN
 
 #oledbutton
 button_LCD = digitalio.DigitalInOut(button_LCD)
-button_LCD.directectio = digital.Direction.INPUT
+button_LCD.direction = digitalio.Direction.INPUT
 button_LCD.pull = digitalio.Pull.DOWN
 
 #poweroffbutton
-button_poweroff = digitalio.DigitalInOut(button_LCD)
-button_poweroff.directectio = digital.Direction.INPUT
+button_poweroff = digitalio.DigitalInOut(button_poweroff_pin)
+button_poweroff.direction = digitalio.Direction.INPUT
 button_poweroff.pull = digitalio.Pull.DOWN
 
 # ThingSpeak API
@@ -58,7 +58,7 @@ first_update = True
 
 # Logger configuration
 logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s :: %(levelname)s :: Module %(module)s :: Line No %(lineno)d :: %(message)s',
+                    format='%(asctime)s :: %(levelname)s :: Module %(module)s :: Line No %(l>
                     filename='weather_station.log')       # Documents/RaspPiProjects/
 
 # Run variable for kill signal detection
@@ -71,11 +71,22 @@ run = True
 def stop_script():
     # Function that executes before the script ends
     display.display_message('Script stopped', True, 3)
-    GPIO.cleanup()
+
+    greenLED.value =  False
+    blueLED.value = False
+
+    greenLED.deinit()
+    blueLED.deinit()
+    button_scriptOFF.deinit()
+    button_LCD.deinit()
+    button_poweroff.deinit()
+
+    logging.info("GPIO cleanup complete.")
 
 def handler_term_signal(signum, frame):
     global run
     logging.info('The script was terminated by a kill command')
+
     stop_script()
     run = False
 
@@ -92,7 +103,7 @@ def get_data():
     global HOSTNAME
     global room_humidity
     global room_temp
-    pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTNAME = sensor.get_pi_data()
+    pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTN>
     room_humidity, room_temp = sensor.get_dht11_data()
 
 # ----------------------------
@@ -112,17 +123,17 @@ while run and button_scriptOFF_pressed is False:
                 time_delta = date_now - last_api_update
 
                 # Updating the API only if enabled AND for the laps specified
-                if API is True and (time_delta.seconds > api_update_time_laps*60 or first_update):
+                if API is True and (time_delta.seconds > api_update_time_laps*60 or first_up>
                     blueLED.value = True
                     display.display_message('Updating ThingSpeak...', False)
                     get_data()
                     first_update, last_api_update = \
-                        thingspeak.update_thingspeak(first_update, pi_temp, room_temp, room_humidity,
+                        thingspeak.update_thingspeak(first_update, pi_temp, room_temp, room_>
                                                           cpu_usage, ram_usage, disk_usage)
                     display.display_clear()
                     blueLED.value = False
 
-                if blutton_LCD.value:
+                if button_LCD.value:
                     blueLED.value = True
                     display.display_message('Measuring...', False)
                     get_data()
@@ -142,4 +153,6 @@ while run and button_scriptOFF_pressed is False:
 
     finally:
         logging.info('Cleaning up in the Finally loop & script stopped')
-        GPIO.cleanup()
+        stop_script()
+
+
