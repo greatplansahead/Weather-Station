@@ -8,7 +8,7 @@ import os
 
 # Raspberry Pi pin & variables definitons &
 hold_time = 3                   # Hold time in sec to poweroff
-button_poweroff_pin = board.D1 
+button_poweroff_pin = board.D16
 
 #setups up the button
 button_poweroff = digitalio.DigitalInOut(button_poweroff_pin)
