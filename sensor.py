@@ -1,6 +1,6 @@
 import digitalio
 import board
-import dht11
+import adafruit_dht
 import psutil
 import socket
 from math import pow
@@ -10,7 +10,7 @@ from time import sleep
 sensor_pin = board.D14
 
 #initialize DHT sensor
-sensor = dht11.DHT11(pin=sensor_pin)
+sensor = adafruit_dht.DHT11(sensor_pin)
 
 def get_pi_data():
     # Calculate CPU temperature of Raspberry Pi in Degrees C
@@ -34,7 +34,6 @@ def get_dht11_data():
     measure = True
     while measure:
        try:
-           sensor.measure()
            humid = sensor.humidity
            temp = sensor.temperature
            sleep(3)
@@ -44,5 +43,3 @@ def get_dht11_data():
            print(f"Error reading DHT11: {e}")
            sleep(2)
     return humid, temp
-
-
