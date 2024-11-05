@@ -12,7 +12,7 @@ blueLED_pin = board.D8
 redLED_pin = board.D16
 button3_pin = board.D21       
 button2_pin = board.D27           
-button1_pin = board.D16             
+button1_pin = board.D10             
 
 # Raspberry Pi pin Setup:
 #blueLED
