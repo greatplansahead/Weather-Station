@@ -18,7 +18,7 @@ import thingspeak
 
 # Raspberry Pi pin definitons
 greenLED_pin = board.D20               # Green LED: ON when script is running
-blueLED_pin = board.D8                 # Blue LED: ON when weather conditions measured and s>
+blueLED_pin = board.D8                 # Blue LED: ON when weather conditions measured and sent to Thing Speak
 button_scriptOFF_pin = board.D21       # Push button to stop the script manually
 button_LCD = board.D27                 # Push button to write data on oled screen
 button_poweroff_pin = board.D16             # Push button to turn off Raspberry Pi
@@ -58,7 +58,7 @@ first_update = True
 
 # Logger configuration
 logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s :: %(levelname)s :: Module %(module)s :: Line No %(l>
+                    format='%(asctime)s :: %(levelname)s :: Module %(module)s :: Line No %(lineno)d :: %(message)s',
                     filename='weather_station.log')       # Documents/RaspPiProjects/
 
 # Run variable for kill signal detection
@@ -71,10 +71,10 @@ run = True
 def stop_script():
     # Function that executes before the script ends
     display.display_message('Script stopped', True, 3)
-
+    
     greenLED.value =  False
     blueLED.value = False
-
+    
     greenLED.deinit()
     blueLED.deinit()
     button_scriptOFF.deinit()
@@ -86,7 +86,6 @@ def stop_script():
 def handler_term_signal(signum, frame):
     global run
     logging.info('The script was terminated by a kill command')
-
     stop_script()
     run = False
 
@@ -103,7 +102,7 @@ def get_data():
     global HOSTNAME
     global room_humidity
     global room_temp
-    pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTN>
+    pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTNAME = sensor.get_pi_data()
     room_humidity, room_temp = sensor.get_dht11_data()
 
 # ----------------------------
@@ -123,12 +122,12 @@ while run and button_scriptOFF_pressed is False:
                 time_delta = date_now - last_api_update
 
                 # Updating the API only if enabled AND for the laps specified
-                if API is True and (time_delta.seconds > api_update_time_laps*60 or first_up>
+                if API is True and (time_delta.seconds > api_update_time_laps*60 or first_update):
                     blueLED.value = True
                     display.display_message('Updating ThingSpeak...', False)
                     get_data()
                     first_update, last_api_update = \
-                        thingspeak.update_thingspeak(first_update, pi_temp, room_temp, room_>
+                        thingspeak.update_thingspeak(first_update, pi_temp, room_temp, room_humidity,
                                                           cpu_usage, ram_usage, disk_usage)
                     display.display_clear()
                     blueLED.value = False
