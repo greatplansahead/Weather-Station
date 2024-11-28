@@ -28,7 +28,7 @@ def get_pi_data():
     # Hostname & IP address
     HOSTNAME = socket.gethostname()
     # IP = socket.gethostbyname(HOSTNAME)
-    return pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used>
+    return pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used, DISK_MAX, disk_usage, disk_used, HOSTNAME
 
 def get_dht11_data():
     measure = True
@@ -43,3 +43,4 @@ def get_dht11_data():
            print(f"Error reading DHT11: {e}")
            sleep(2)
     return humid, temp
+
