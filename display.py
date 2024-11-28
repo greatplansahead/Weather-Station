@@ -12,7 +12,7 @@ HEIGHT = 32
 # 128x32 display with hardware I2C:
 i2c = board.I2C()
 disp = adafruit_ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3C)
-
+                                       
 def display_clear():
 
     # Clear display.
@@ -87,7 +87,7 @@ def display_weather(room_temp, room_humidity):
 
     # Display image.
     disp.image(image)
-      disp.show()
+    disp.show()
 
     sleep(10)
 
@@ -122,9 +122,9 @@ def display_config(pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used):
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     draw.text((x, top), "RASPBERRY PI", font=font, fill=255)
-    draw.text((x, top + 8), "Temperature: " + str(int(round(pi_temp))) + "degC", font=font, >
+    draw.text((x, top + 8), "Temperature: " + str(int(round(pi_temp))) + "degC", font=font, fill=255)
     draw.text((x, top + 16), "CPU: " + str(cpu_usage) + "%", font=font, fill=255)
-    draw.text((x, top + 25), "RAM: " + str(ram_used) + "/" + str(RAM_MAX) + "MB " + str(int(>
+    draw.text((x, top + 25), "RAM: " + str(ram_used) + "/" + str(RAM_MAX) + "MB " + str(int(round(ram_usage))) + "%",
               font=font, fill=255)
 
     # Display image.
@@ -135,4 +135,3 @@ def display_config(pi_temp, cpu_usage, RAM_MAX, ram_usage, ram_used):
 
     disp.fill(0)
     disp.show()
-
