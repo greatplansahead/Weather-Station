@@ -1,13 +1,12 @@
-
 # Module with all the functions to connect to ThingSpeak in the Cloud
 
 import requests
 import logging
 from datetime import datetime
 
-def update_thingspeak(first_update, pi_temp, room_temp, room_humidity, cpu_usage, ram_usage,>
+def update_thingspeak(first_update, pi_temp, room_temp, room_humidity, cpu_usage, ram_usage, disk_usage):
     # ThingSpeak API key
-    writeKey = ''     # Enter your own writeKey
+    writeKey = 'YOURWRITEKEY'     # Enter your own writeKey
 
     # Thingspeak API connection
     params = {'field1': pi_temp,
